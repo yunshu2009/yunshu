@@ -145,6 +145,8 @@ static void php_yunshu_init_globals(zend_yunshu_globals *yunshu_globals)
 */
 /* }}} */
 
+
+//扩展初始化调用此方法
 /* {{{ PHP_MINIT_FUNCTION
  */
 PHP_MINIT_FUNCTION(yunshu)
@@ -152,6 +154,17 @@ PHP_MINIT_FUNCTION(yunshu)
 	/* If you have INI entries, uncomment these lines
 	REGISTER_INI_ENTRIES();
 	*/
+
+  /*
+    宏方法的最后一个参数是一些标识符。
+    CONST_PERSISTENT 表示为持久的。常驻内存。
+    CONST_CS  表示为区分大小写。
+  */
+  // REGISTER_STRINGL_CONSTANT("__SITE__", "yunshu.me", 12, CONST_PERSISTENT);
+  //带命令空间yunshu
+  REGISTER_NS_STRINGL_CONSTANT("yunshu", "__SITE__", "yunshu.me", 9, CONST_CS|CONST_PERSISTENT);
+  REGISTER_NS_STRINGL_CONSTANT("yunshu", "__AUTHOR__", "yunshu", 6, CONST_CS|CONST_PERSISTENT);
+
 	return SUCCESS;
 }
 /* }}} */
