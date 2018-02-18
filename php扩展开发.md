@@ -76,3 +76,22 @@ ZSTR_开头的宏方法是`zend_string`结构专属的方法。主要有如下�
 
 ```ZSTR_VAL``` ```ZSTR_LEN``` ```ZSTR_H```宏方法分别对应```zend_string```结构的成员。```ZSTR_HASH```是获取字符串的hash值，如果不存在，就调用hash函数生成一个。
 
+## PHP7扩展开发之传参与返回值
+
+返回值
+方法的返回值是使用`RETURN_`开头的宏方法进行返回的。常用的宏方法有：
+RETURN_NULL()	返回null
+RETURN_LONG(l)	返回整型
+RETURN_DOUBLE(d) 返回浮点型
+RETURN_STR(s)	返回一个字符串。参数是一个zend_string * 指针
+RETURN_STRING(s)	返回一个字符串。参数是一个char * 指针
+RETURN_STRINGL(s, l) 返回一个字符串。第二个参数是字符串长度。
+RETURN_EMPTY_STRING()	返回一个空字符串。
+RETURN_ARR(r)	返回一个数组。参数是zend_array *指针。
+RETURN_OBJ(r) 返回一个对象。参数是zend_object *指针。
+RETURN_ZVAL(zv, copy, dtor) 返回任意类型。参数是 zval *指针。
+RETURN_FALSE	返回false
+RETURN_TRUE	返回true
+
+更多宏方法请查看 ```Zend/zend_API.h```中的相关代码。
+

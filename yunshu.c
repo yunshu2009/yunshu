@@ -44,6 +44,66 @@ PHP_INI_END()
 */
 /* }}} */
 
+PHP_FUNCTION(default_value)
+{
+    zend_string     *type;    
+    zval            *value = NULL;
+ 
+#ifndef FAST_ZPP
+    /* Get function parameters and do error-checking. */
+    /*
+      在PHP7之前一直使用zend_parse_parameters函数获取参数。这个函数的作用，就是把传入的参数转换为PHP内核中相应的类型，方便在PHP扩展中使用。
+      参数说明：
+      第一个参数，参数个数。一般就使用ZEND_NUM_ARGS()，不需要改变。
+      第二个参数，格式化字符串。这个格式化字符串的作用就是，指定传入参数与PHP内核类型的转换关系。
+
+      代码中 S|z 的含义就是：
+      S 表示参数是一个字符串。要把传入的参数转换为zend_string类型。
+      | 表示之后的参数是可选。可以传，也可以不传。
+      z 表示参数是多种类型。要把传入的参数转换为zval类型。
+    */
+    if (zend_parse_parameters(ZEND_NUM_ARGS(), "S|z", &type, &value) == FAILURE) {
+        return;
+    }    
+#else
+    /*
+    在PHP7中新提供的方式。是为了提高参数解析的性能。对应经常使用的方法，建议使用FAST ZPP方式。 
+    使用方式：
+      以ZEND_PARSE_PARAMETERS_START(1, 2)开头。
+      第一个参数表示必传的参数个数，第二个参数表示最多传入的参数个数。
+      以`ZEND_PARSE_PARAMETERS_END();`结束。
+      中间是传入参数的解析。
+      值得注意的是，一般FAST ZPP的宏方法与zend_parse_parameters的specifier是一一对应的。如：
+      Z_PARAM_OPTIONAL 对应 |
+      Z_PARAM_STR 对应 S
+      但是，Z_PARAM_ZVAL_EX方法比较特殊。它对应两个specifier，分别是 ! 和 / 。! 对应宏方法的第二个参数。/ 对应宏方法的第三个参数。如果想开启，只要设置为1即可。
+
+      FAST ZPP相应的宏方法可以查看官方网站 https://wiki.php.net/rfc/fast_zpp#proposal
+    */
+    ZEND_PARSE_PARAMETERS_START(1, 2)
+        Z_PARAM_STR(type)
+        Z_PARAM_OPTIONAL
+        //??
+        Z_PARAM_ZVAL_EX(value, 0, 1)
+    ZEND_PARSE_PARAMETERS_END();
+#endif
+     
+    if (ZSTR_LEN(type) == 3 && strncmp(ZSTR_VAL(type), "int", 3) == 0 && value == NULL) {
+        RETURN_LONG(0);
+    } else if (ZSTR_LEN(type) == 3 && strncmp(ZSTR_VAL(type), "int", 3) == 0 && value != NULL) {
+        RETURN_ZVAL(value, 0, 1); 
+    } else if (ZSTR_LEN(type) == 4 && strncmp(ZSTR_VAL(type), "bool", 4) == 0 && value == NULL) {
+        RETURN_FALSE;
+    } else if (ZSTR_LEN(type) == 4 && strncmp(ZSTR_VAL(type), "bool", 4) == 0 && value != NULL) {
+        RETURN_ZVAL(value, 0, 1); 
+    } else if (ZSTR_LEN(type) == 3 && strncmp(ZSTR_VAL(type), "str", 3) == 0 && value == NULL) {
+        RETURN_EMPTY_STRING();
+    } else if (ZSTR_LEN(type) == 3 && strncmp(ZSTR_VAL(type), "str", 3) == 0 && value != NULL) {
+        RETURN_ZVAL(value, 0, 1); 
+    } 
+    RETURN_NULL();
+}
+
 /*获取变量长度,只支持字符串和数组*/
 PHP_FUNCTION(get_length) 
 {
