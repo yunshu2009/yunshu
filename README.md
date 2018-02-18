@@ -33,3 +33,4 @@ php -m|grep yunshu
 
 ### 参考
 1. [信海龙的博客](http://www.bo56.com/)
+2. [PHP7内核剖析](https://github.com/pangudashu/php7-internal)
